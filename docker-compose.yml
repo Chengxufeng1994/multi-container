@@ -1,0 +1,67 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=test
+    ports:
+      - 3306:3306
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+  server: 
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5000:5000
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=test
+    volumes:
+      - /usr/src/app/node_modules
+      - ./server:/usr/src/app
+    depends_on:
+      - redis
+      - mysql
+
+  client:
+    stdin_open: true
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - /usr/src/app/node_modules
+      - ./client:/usr/src/app
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /usr/src/app/node_modules
+      - ./worker:/usr/src/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  nginx:
+    restart: always
+    build:
+      context: ./nginx 
+    ports:
+      - 3030:80
+    depends_on:
+      - server 
+      - client
