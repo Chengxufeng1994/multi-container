@@ -60,6 +60,7 @@ services:
     restart: always
     build:
       context: ./nginx 
+      dockerfile: Dockerfile.dev
     ports:
       - 3030:80
     depends_on:
