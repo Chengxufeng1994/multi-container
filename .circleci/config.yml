@@ -1,6 +1,8 @@
 version: 2.1
 executors:
   docker-executor:
+    environment:
+      IMAGE_NAME: bennycheng/client-test
     docker:
       -image: cimg/base:2021.04
 jobs:
@@ -14,14 +16,26 @@ jobs:
       - run:
           name: Build client application Docker image
           command: |
-            docker build -t bennycheng/client-test -f ./client/Dockerfile.dev ./client
+            docker build -t $IMAGE_NAME:latest -f ./client/Dockerfile.dev ./client
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
   test:
     executor: docker-executor
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - checkout
       - setup_remote_docker:
           version: 19.03.14
           docker_layer_caching: true
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
       - run:
           name: Test client application Docker image
           command: |
