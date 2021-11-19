@@ -6,8 +6,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-        version: 19.03.13
-        docker_layer_caching: true
+          version: 19.03.13
+          docker_layer_caching: true
       - run:
           name: Build client application Docker image
           command: |
@@ -15,14 +15,14 @@ jobs:
       - run:
           name: Test client application Docker image
           command: |
-            docker run bennycheng/client-test npm run test:ci -- --coverage
+            docker run bennycheng/client-test npm run test:ci
       - run:
           name: Build application Docker image
           command: |
-            docker build -t bennycheng/multi-client -f ./client
-            docker build -t bennycheng/multi-nginx -f ./nginx
-            docker build -t bennycheng/multi-server -f ./server
-            docker build -t bennycheng/multi-worker -f ./worker
+            docker build -t bennycheng/multi-client ./client
+            docker build -t bennycheng/multi-nginx ./nginx
+            docker build -t bennycheng/multi-server ./server
+            docker build -t bennycheng/multi-worker ./worker
 
 workflows:
   version: 2
