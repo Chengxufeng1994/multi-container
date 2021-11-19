@@ -1,24 +1,26 @@
 version: 2.1
+executors:
+  docker-executor:
+    docker:
+      -image: cimg/base:2021.04
 jobs:
   build:
-    docker:
-      - image: cimg/base:2021.04
+    executor: docker-executor
     steps:
       - checkout
       - setup_remote_docker:
-          version: 19.03.13
+          version: 19.03.14
           docker_layer_caching: true
       - run:
           name: Build client application Docker image
           command: |
             docker build -t bennycheng/client-test -f ./client/Dockerfile.dev ./client
   test:
-    docker:
-      - image: cimg/base:2021.04
+    executor: docker-executor
     steps:
       - checkout
       - setup_remote_docker:
-          version: 19.03.13
+          version: 19.03.14
           docker_layer_caching: true
       - run:
           name: Test client application Docker image
