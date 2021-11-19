@@ -4,7 +4,7 @@ executors:
     environment:
       IMAGE_NAME: bennycheng/client-test
     docker:
-      -image: cimg/base:2021.04
+      - image: cimg/base:2021.04
 jobs:
   build:
     executor: docker-executor
